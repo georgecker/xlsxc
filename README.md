@@ -59,3 +59,10 @@ Example:
 - Sets excel render width: --width 53
 - Sets excel render height: --height 32
 - Output to excel file: -o ~/rick_roll.xlsx
+
+### EXCEL
+1. Open the created excel file
+2. Change to Automation ![Change to Automation](./img/excel_how_to_1.png)
+3. Add new Office Script ![Add new Office Script](./img/excel_how_to_2.png)
+4. Copy all of the contents of the xlsx_render.ts file into the newly created script ![](./img/excel_how_to_3.png)
+5. Run
