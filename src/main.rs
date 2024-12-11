@@ -3,6 +3,7 @@ mod image_conversion;
 use core::{panic, str};
 use std::{
     collections::HashMap,
+    env,
     fs::{self, File},
     io::{self, BufRead, BufReader, Write},
     process::{Child, Command, Stdio},
@@ -15,11 +16,6 @@ use clap::Parser;
 use image_conversion::ImageDataReaderManager;
 use simple_xlsx_writer::{row, Row, WorkBook};
 
-// Excel has a char limit of 32.000 per cell
-// -> Split frame into own cells
-// TODO - CLI piping
-// TODO - Write Color in HexCode formate into cells
-
 #[derive(Parser, Debug)]
 struct CLIArgs {
     /// URL of the srouce youtube video
@@ -27,8 +23,8 @@ struct CLIArgs {
     src_url: String,
 
     /// Optional -> System temp dir can be overriden
-    #[arg(short, long, env)]
-    tempdir: String,
+    #[arg(short, long, env, default_value_t = env::var("TMPDIR").unwrap())]
+    tmpdir: String,
 
     /// Ratio of frame compression. A ratio of 10/1 means only every tenth frame will be extracted
     #[arg(short, long, default_value_t = String::from("20/1"))]
@@ -50,23 +46,21 @@ struct CLIArgs {
 fn main() {
     let args = CLIArgs::parse();
     println!("{:?}", args);
-    return;
 
-    // CONFIG
-    let src = "https://www.youtube.com/shorts/4ruabxT8nI4";
-    let buff_path = "/Users/georgecker/Projects/xlsxc/data/";
-    let extract_ratio = "15/1";
-    let width = 50;
-    let height = 50;
+    let url = args.src_url;
+    let buff_path = args.tmpdir;
+    let extract_ratio = args.ratio;
+    let width = args.width;
+    let height = args.height;
 
-    let excel_path = "/Users/georgecker/test.xlsx";
+    let excel_path = args.out_path;
 
     // Donwlaod video
     let path_output = buff_path.to_owned() + "temp";
     let frames_dir_path = buff_path.to_string() + "frames/";
 
-    downlaod(src, &path_output);
-    extract_frames(&frames_dir_path, &path_output, extract_ratio);
+    downlaod(&url, &path_output);
+    extract_frames(&frames_dir_path, &path_output, &extract_ratio);
 
     let frames_dir_reader = fs::read_dir(&frames_dir_path)
         .unwrap_or_else(|_| panic!("File not found \"{}\"", &frames_dir_path));
@@ -96,7 +90,7 @@ fn main() {
     {}
 
     let id_count = ids.len();
-    write_excel(map.clone(), id_count, width as usize, excel_path);
+    write_excel(map.clone(), id_count, width as usize, &excel_path);
 }
 
 fn write_excel(
@@ -114,8 +108,6 @@ fn write_excel(
             // replace with id_count
             for i in 1..=id_count {
                 let val = map.get(&i).unwrap();
-                // let val_formatted = format!("{:?}", val);
-                // let val_str = val_formatted.trim_matches(['[', ']']);
 
                 let mut id_frame = String::new();
                 id_frame.push_str(&format!("{}:", width));
@@ -123,7 +115,6 @@ fn write_excel(
                     id_frame.push_str(&format!("{:02X}{:02X}{:02X}", chunk[0], chunk[1], chunk[2]));
                 }
 
-                // let id_frame = format!("{}:{}", width, val_str);
                 sheet_writer.write_row(row![(id_frame)]).unwrap();
             }
             Ok(())
