@@ -19,11 +19,13 @@ The converter calls the dependent libs via the command line. Make sure to have t
 1. Parse command line input
 2. Dowloads the src video from provided url
 3. Extracts the frames of the video
-4. Reads pixel color values of each frame
+4. Reads pixel color values of each frame (i made that process multithreaded, because it took relatively long. All threads are managed by the ImageDataReaderManager)
 6. Write all pixel color values (rgb) for each frame into its own cell
 7. Each frame cell is located in the first column and contains the width of the frame and the color values seperated by a `:`
 8. Afterwards the provided office script reads each frame (cell)
-9. And colors the corresponding cell
+9. The frame data will be chunked into strings of len 6 (HexCode for rgb is represented as 6 bytes/chars)
+10. Than each chunk gets iterated and each cell in row is colored
+11. If the chunk index exceeds the frame with, than the writing will do a linebreak and write in the next row
 
 ## How to use
 Clone the repo or download the excetuable (xlsxc/executable):
