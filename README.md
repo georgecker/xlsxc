@@ -4,6 +4,9 @@
 Currently xlsxc is only tested on OSX, but probably runs on other UNIX like operating systems like linux.
 
 ## Dependencies
+### EXCEL
+The rendering code is written in office script. Therefore an [office 365 enterprise](https://techcommunity.microsoft.com/blog/excelblog/office-scripts-is-now-available-for-office-365-enterprise-e1-and-office-365-f3-l/4089088) version is needed.
+
 ### BUILD
 Xlsxc is written in rust and therefore needs to be build from source via cargo.
 
