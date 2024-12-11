@@ -21,6 +21,9 @@ The converter calls the dependent libs via the command line. Make sure to have t
 3. Extracts the frames of the video
 4. Reads pixel color values of each frame
 6. Write all pixel color values (rgb) for each frame into its own cell
+7. Each frame cell is located in the first column and contains the width of the frame and the color values seperated by a `:`
+8. Afterwards the provided office script reads each frame (cell)
+9. And colors the corresponding cell
 
 ## How to use
 Clone the repo or download the excetuable (xlsxc/executable):
